@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model addresses {
+  id           String    @id(map: "PK_745d8f43d3af10ab8247465e450") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  addressLine1 String    @db.VarChar
+  addressLine2 String?   @db.VarChar
+  city         String    @db.VarChar
+  state        String    @db.VarChar
+  country      String    @db.VarChar
+  zipCode      String?   @db.VarChar
+  firstName    String    @db.VarChar
+  middleName   String?   @db.VarChar
+  lastName     String?   @db.VarChar
+  customerId   String?   @db.Uuid
+  customer     customer? @relation(fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_b5976584943ec93aa5394a55320")
+}
+
+model customer {
+  id         String      @id(map: "PK_a7a13f4cacb744524e44dfdad32") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  firstName  String      @db.VarChar
+  middleName String?     @db.VarChar
+  lastName   String?     @db.VarChar
+  email      String?     @unique(map: "UQ_fdb2f3ad8115da4c7718109a6eb") @db.VarChar
+  password   String?     @db.VarChar
+  phone      String?     @db.VarChar
+  addresses  addresses[]
+}
+
+model items {
+  id          String @id(map: "PK_ba5885359424c15ca6b9e79bcf6") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name        String @db.VarChar
+  description String @db.VarChar
+  price       Int
+  image       String @db.VarChar
+  category    String @db.VarChar
+  stock       Int
+  rating      Int
+  numReviews  Int
+}
+
+model user {
+  id        Int    @id(map: "PK_cace4a159ff9f2512dd42373760") @default(autoincrement())
+  firstName String @db.VarChar
+  lastName  String @db.VarChar
+  age       Int
+}
