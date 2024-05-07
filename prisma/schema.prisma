@@ -34,15 +34,16 @@ model customer {
 }
 
 model items {
-  id          String @id(map: "PK_ba5885359424c15ca6b9e79bcf6") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name        String @db.VarChar
-  description String @db.VarChar
+  id          String  @id(map: "PK_ba5885359424c15ca6b9e79bcf6") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name        String  @db.VarChar
+  description String? @db.VarChar
   price       Int
-  image       String @db.VarChar
-  category    String @db.VarChar
-  stock       Int
-  rating      Int
-  numReviews  Int
+  image       String? @db.VarChar
+  category    String? @db.VarChar
+  stock       Int     @default(0)
+  rating      Int?
+  numReviews  Int?
+  timeToCook  String?
 }
 
 model user {
