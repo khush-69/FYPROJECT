@@ -79,15 +79,16 @@ model payment {
   customerid String?   @db.Uuid
   date       DateTime? @db.Timestamptz(6)
   amount     Float?
+  status     String?
   customer   customer? @relation(fields: [customerid], references: [id], onDelete: NoAction, onUpdate: NoAction)
   Order      Order?    @relation(fields: [orderid], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model Cart {
-  id     String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId String?    @db.Uuid
-  user   customer?  @relation(fields: [userId], references: [id])
-  items  CartItem[]
+  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  customerId String?    @db.Uuid
+  customer   customer?  @relation(fields: [customerId], references: [id])
+  items      CartItem[]
 }
 
 model CartItem {
