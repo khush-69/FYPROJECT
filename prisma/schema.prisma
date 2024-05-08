@@ -8,7 +8,7 @@ datasource db {
 }
 
 model addresses {
-  id           String    @id(map: "PK_745d8f43d3af10ab8247465e450") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id           String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   addressLine1 String    @db.VarChar
   addressLine2 String?   @db.VarChar
   city         String    @db.VarChar
@@ -19,31 +19,51 @@ model addresses {
   middleName   String?   @db.VarChar
   lastName     String?   @db.VarChar
   customerId   String?   @db.Uuid
+  Order        Order[]
   customer     customer? @relation(fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_b5976584943ec93aa5394a55320")
 }
 
 model customer {
-  id         String      @id(map: "PK_a7a13f4cacb744524e44dfdad32") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  id         String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   firstName  String      @db.VarChar
   middleName String?     @db.VarChar
   lastName   String?     @db.VarChar
   email      String?     @unique(map: "UQ_fdb2f3ad8115da4c7718109a6eb") @db.VarChar
   password   String?     @db.VarChar
   phone      String?     @db.VarChar
+  Order      Order[]
   addresses  addresses[]
+  payment    payment[]
+  Cart       Cart[]
 }
 
 model items {
-  id          String  @id(map: "PK_ba5885359424c15ca6b9e79bcf6") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name        String  @db.VarChar
-  description String? @db.VarChar
+  id          String     @id(map: "PK_ba5885359424c15ca6b9e79bcf6") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name        String     @db.VarChar
+  description String?    @db.VarChar
   price       Int
-  image       String? @db.VarChar
-  category    String? @db.VarChar
-  stock       Int     @default(0)
+  image       String?    @db.VarChar
+  category    String?    @db.VarChar
+  stock       Int        @default(0)
   rating      Int?
   numReviews  Int?
   timeToCook  String?
+  Order       Order[]
+  CartItem    CartItem[]
+}
+
+model Order {
+  id              String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  status          String?    @default("pending") @db.VarChar
+  netamount       Float?
+  customercomment String?    @db.VarChar
+  date            DateTime?  @db.Timestamptz(6)
+  customerid      String?    @db.Uuid
+  addressid       String?    @db.Uuid
+  addresses       addresses? @relation(fields: [addressid], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  customer        customer?  @relation(fields: [customerid], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payment         payment[]
+  items           items[]
 }
 
 model user {
@@ -51,4 +71,30 @@ model user {
   firstName String @db.VarChar
   lastName  String @db.VarChar
   age       Int
+}
+
+model payment {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderid    String?   @db.Uuid
+  customerid String?   @db.Uuid
+  date       DateTime? @db.Timestamptz(6)
+  amount     Float?
+  customer   customer? @relation(fields: [customerid], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Order      Order?    @relation(fields: [orderid], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Cart {
+  id     String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId String?    @db.Uuid
+  user   customer?  @relation(fields: [userId], references: [id])
+  items  CartItem[]
+}
+
+model CartItem {
+  id       String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  cartId   String @db.Uuid
+  cart     Cart   @relation(fields: [cartId], references: [id])
+  itemId   String @db.Uuid
+  item     items  @relation(fields: [itemId], references: [id])
+  quantity Int
 }
